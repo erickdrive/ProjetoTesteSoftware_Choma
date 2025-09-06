@@ -18,7 +18,16 @@ def run(playwright: Playwright) -> None:
     time.sleep(1)
     page.get_by_role("link", name="My Info").click()
     time.sleep(1)
-
+    page.locator("span").filter(has_text="Mahesh Mankar").click()
+    page.get_by_role("menuitem", name="Logout").click()
+    time.sleep(1)
+    page.get_by_role("textbox", name="Username").fill("joaochoma")
+    time.sleep(1)
+    page.get_by_role("textbox", name="Password").fill("aprovado")
+    page.get_by_role("button", name="Login").click()
+    time.sleep(1)
+    page.get_by_text("Invalid credentials").click()
+    time.sleep(1)
     # ---------------------
     context.close()
     browser.close()

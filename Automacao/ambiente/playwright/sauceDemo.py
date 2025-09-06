@@ -30,7 +30,17 @@ def run(playwright: Playwright) -> None:
     page.locator("[data-test=\"finish\"]").click()
     page.locator("[data-test=\"back-to-products\"]").click()
     time.sleep(3)
-
+    page.get_by_role("button", name="Open Menu").click()
+    time.sleep(3)
+    page.locator("[data-test=\"logout-sidebar-link\"]").click()
+    time.sleep(3)
+    page.locator("[data-test=\"username\"]").fill("joaochoma")
+    time.sleep(3)
+    page.locator("[data-test=\"password\"]").fill("aprovado")
+    time.sleep(3)
+    page.locator("[data-test=\"login-button\"]").click()
+    page.locator("[data-test=\"error\"]").click()
+    time.sleep(3)
     # ---------------------
     context.close()
     browser.close()

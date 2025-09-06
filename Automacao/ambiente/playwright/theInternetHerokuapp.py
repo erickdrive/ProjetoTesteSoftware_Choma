@@ -15,7 +15,13 @@ def run(playwright: Playwright) -> None:
     time.sleep(3)
     page.get_by_role("link", name="Logout").click()
     time.sleep(3)
-
+    page.get_by_role("textbox", name="Username").fill("joaochoma")
+    time.sleep(3)
+    page.get_by_role("textbox", name="Password").fill("aprovado")
+    page.get_by_role("button", name=" Login").click()
+    time.sleep(3)
+    page.get_by_text("Your username is invalid! ×").click()
+    time.sleep(3)
     # ---------------------
     context.close()
     browser.close()
