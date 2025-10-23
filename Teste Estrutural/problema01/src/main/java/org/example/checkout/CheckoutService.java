@@ -52,7 +52,7 @@ public class CheckoutService {
         double firstPct = (primeiraCompra && subtotal >= 50.0) ? 0.05 : 0.0;
 
         CouponResult cr = couponService.evaluate(couponCode, today, couponExpiryInclusive, subtotal);
-        double couponPct = cr.percent;
+        double couponPct = cr.getPercent();
 
         double totalPct = tierPct + firstPct + couponPct;
         if (totalPct > 0.30) totalPct = 0.30;
@@ -66,7 +66,7 @@ public class CheckoutService {
         double tax = Money.round2(baseTributavelAposDesc * 0.12);
 
         // frete
-        boolean freeByCouponWeight = cr.freeShipping && peso <= 5.0;
+        boolean freeByCouponWeight = cr.isFreeShipping() && peso <= 5.0;
         double shipping = shippingService.calculate(region, peso, baseAposDesconto, freeByCouponWeight);
 
         double total = Money.round2(baseAposDesconto + tax + shipping);

@@ -1,11 +1,27 @@
 package org.example.checkout;
 
-final class CouponResult {
-    final double percent;      // 0.10 = 10%  |  0.0 se sem desconto %
-    final boolean freeShipping;
+public class CouponResult {
+    private double percent;      // 0.10 = 10%  |  0.0 se sem desconto %
+    private boolean freeShipping;
 
-    CouponResult(double percent, boolean freeShipping) {
+    public CouponResult(double percent, boolean freeShipping) {
         this.percent = percent;
+        this.freeShipping = freeShipping;
+    }
+
+    public double getPercent() {
+        return percent;
+    }
+
+    public void setPercent(double percent) {
+        this.percent = percent;
+    }
+
+    public boolean isFreeShipping() {
+        return freeShipping;
+    }
+
+    public void setFreeShipping(boolean freeShipping) {
         this.freeShipping = freeShipping;
     }
 }

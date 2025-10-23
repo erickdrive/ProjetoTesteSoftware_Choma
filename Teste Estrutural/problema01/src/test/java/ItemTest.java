@@ -34,4 +34,23 @@ public class ItemTest {
         );
         assertEquals("categoria", exception.getMessage());
     }
+
+    @Test
+    public void mostrarPrecoUnitarioTeste(){
+        Item item = new Item("categoria", 45.00, 100);
+        assertEquals(45.00, item.getPrecoUnitario());
+    }
+
+    @Test
+    public void mostrarCategoriaTeste(){
+        Item item = new Item("categoria", 45.00, 100);
+        assertEquals("categoria", item.getCategoria());
+    }
+
+    @Test
+    public void mostrarQuantidadeTeste(){
+        Item item = new Item("categoria", 45.00, 100);
+        assertEquals(100, item.getQuantidade());
+    }
+
 }
