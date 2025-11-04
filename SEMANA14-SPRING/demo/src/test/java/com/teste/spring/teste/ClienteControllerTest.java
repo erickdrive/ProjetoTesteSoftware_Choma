@@ -1,11 +1,16 @@
 package com.teste.spring.teste;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teste.spring.teste.controller.ClienteController;
+import com.teste.spring.teste.dto.ClienteDto;
+import com.teste.spring.teste.exception.BusinessException;
+import com.teste.spring.teste.exception.NotFoundException;
 import com.teste.spring.teste.model.Cliente;
 import com.teste.spring.teste.repository.ClienteRepository;
 import com.teste.spring.teste.service.ClienteService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
@@ -18,14 +23,18 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ClienteController.class)
 public class ClienteControllerTest {
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    ObjectMapper mapper;
 
     @MockBean
     ClienteRepository repo;
@@ -69,5 +78,103 @@ public class ClienteControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.number").value(0))
                 .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    void criarCliente() throws Exception {
+        ClienteDto dto = new ClienteDto();
+        dto.setNome("João");
+        dto.setEmail("joao@ex.com");
+        dto.setTelefone("123");
+
+        Cliente salvo = new Cliente();
+        salvo.setId(1L);
+        salvo.setNome("João");
+        salvo.setEmail("joao@ex.com");
+        salvo.setTelefone("123");
+
+        when(service.criar(any(Cliente.class))).thenReturn(salvo);
+
+        mvc.perform(post("/api/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("João"))
+                .andExpect(jsonPath("$.email").value("joao@ex.com"));
+    }
+
+    @Test
+    void buscarCliente() throws Exception {
+        Cliente cliente = new Cliente();
+        cliente.setId(1L);
+        cliente.setNome("Maria");
+        cliente.setEmail("maria@ex.com");
+        cliente.setTelefone("999");
+
+        when(service.buscar(1L)).thenReturn(cliente);
+
+        mvc.perform(get("/api/clientes/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Maria"))
+                .andExpect(jsonPath("$.email").value("maria@ex.com"));
+    }
+
+    @Test
+    void atualizarCliente() throws Exception {
+        ClienteDto dto = new ClienteDto();
+        dto.setNome("Novo");
+        dto.setEmail("novo@ex.com");
+        dto.setTelefone("7777");
+
+        Cliente atualizado = new Cliente();
+        atualizado.setId(1L);
+        atualizado.setNome("Novo");
+        atualizado.setEmail("novo@ex.com");
+        atualizado.setTelefone("7777");
+
+        when(service.atualizar(eq(1L), any(Cliente.class))).thenReturn(atualizado);
+
+        mvc.perform(put("/api/clientes/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.nome").value("Novo"))
+                .andExpect(jsonPath("$.email").value("novo@ex.com"));
+    }
+
+    @Test
+    void excluirCliente() throws Exception {
+        Mockito.doNothing().when(service).excluir(1L);
+
+        mvc.perform(delete("/api/clientes/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void retornaNotFoundException() throws Exception {
+        when(service.buscar(99L)).thenThrow(new NotFoundException("Cliente não encontrado"));
+
+        mvc.perform(get("/api/clientes/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Cliente não encontrado"));
+    }
+
+    @Test
+    void retornaBusinessException() throws Exception {
+        ClienteDto dto = new ClienteDto();
+        dto.setNome("João");
+        dto.setEmail("existente@ex.com");
+        dto.setTelefone("111");
+
+        when(service.criar(any(Cliente.class))).thenThrow(new BusinessException("Email já cadastrado"));
+
+        mvc.perform(post("/api/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().string("Email já cadastrado"));
     }
 }
