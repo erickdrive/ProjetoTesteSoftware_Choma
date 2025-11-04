@@ -1,3 +1,5 @@
+package com.teste.spring.teste;
+
 import com.teste.spring.teste.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 
